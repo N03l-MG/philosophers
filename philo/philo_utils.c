@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 15:19:34 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/03 15:41:16 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/04 15:51:34 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,4 +49,12 @@ t_seat	*ft_lstnew(void *content)
 	list->philosopher = content;
 	list->next = NULL;
 	return (list);
+}
+
+long	current_time_ms(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
