@@ -13,7 +13,7 @@
 #include "philo.h"
 
 t_philo	*create_philo(char **args, int goal, int i, pthread_mutex_t *left_fork);
-t_seat	*init_philo(char **args, int goal);
+t_seat	*init_philo(int philo_num, char **args, int goal);
 void	*philo_routine(void *arg);
 void	start(t_seat *table, int num_philosophers);
 
@@ -23,7 +23,7 @@ int	main(int argc, char *argv[])
 	int		meal_goal;
 
 	if (argc == 5)
-		meal_goal = -1; // TODO: This does not work right now LMFAO
+		meal_goal = -1;
 	else if (argc == 6)
 		meal_goal = ft_atoi(argv[5]);
 	else
@@ -32,7 +32,7 @@ int	main(int argc, char *argv[])
 		printf(" (optional) eating goal\n");
 		return (1);
 	}
-	table = init_philo(argv + 1, meal_goal);
+	table = init_philo(ft_atoi(argv[1]), argv + 1, meal_goal);
 	if (!table)
 	{
 		printf("Failed to initialize philosophers\n");
@@ -60,22 +60,25 @@ t_philo	*create_philo(char **args, int goal, int i, pthread_mutex_t *left_fork)
 	return (philosopher);
 }
 
-t_seat	*init_philo(char **args, int goal) // TODO: Norm refactor
+t_seat	*init_philo(int philo_num, char **args, int goal)
 {
-	int				philo_num;
-	t_seat			*first = NULL;
-	t_seat			*prev = NULL;
+	t_seat			*first;
+	t_seat			*prev;
 	t_seat			*current;
 	pthread_mutex_t	*forks;
 	int				i;
 
 	philo_num = ft_atoi(args[0]);
+	first = NULL;
+	prev = NULL;
 	forks = malloc(sizeof(pthread_mutex_t) * philo_num);
 	if (!forks)
 		return (NULL);
-	for (i = 0; i < philo_num; i++)
+	i = -1;
+	while (++i < philo_num)
 		pthread_mutex_init(&forks[i], NULL);
-	for (i = 0; i < philo_num; i++)
+	i = -1;
+	while (++i < philo_num)
 	{
 		current = malloc(sizeof(t_seat));
 		if (!current)
@@ -100,18 +103,18 @@ t_seat	*init_philo(char **args, int goal) // TODO: Norm refactor
 	return (first);
 }
 
-void	*philo_routine(void *arg) // TODO: Norm refactor
+void	*philo_routine(void *arg)
 {
-	t_philo *philo;
+	t_philo	*philo;
 	long	current_time;
 
 	philo = (t_philo *)arg;
-	while (philo->eat_counter > 0)
+	while (philo->eat_counter != 0)
 	{
 		current_time = current_time_ms();
 		if (current_time - philo->last_meal_time > philo->time_to_die)
 		{
-			printf("%ld %d has died\n", current_time, philo->philo_id);
+			printf("%ld %d died\n", current_time, philo->philo_id);
 			pthread_exit(NULL);
 		}
 		printf("%ld %d is thinking\n", current_time, philo->philo_id);
@@ -134,7 +137,8 @@ void	*philo_routine(void *arg) // TODO: Norm refactor
 		printf("%ld %d is eating\n", current_time, philo->philo_id);
 		philo->last_meal_time = current_time_ms();
 		usleep(philo->time_to_eat * 1000);
-		philo->eat_counter--;
+		if (philo->eat_counter > 0)
+			philo->eat_counter--;
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		current_time = current_time_ms();
@@ -157,14 +161,14 @@ void	start(t_seat *table, int num_philosophers)
 		return ;
 	}
 	current = table;
-	i = 0;
-	while (i < num_philosophers)
+	i = -1;
+	while (++i < num_philosophers)
 	{
 		pthread_create(&threads[i], NULL, philo_routine, current->philosopher);
 		current = current->next;
-		i++;
 	}
-	for (i = 0; i < num_philosophers; i++)
+	i = -1;
+	while (++i < num_philosophers)
 		pthread_join(threads[i], NULL);
 	free(threads);
 }
