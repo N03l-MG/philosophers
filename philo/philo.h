@@ -22,6 +22,13 @@
 # include <pthread.h>
 # include <sys/time.h>
 
+typedef struct s_state
+{
+	bool			has_died;
+	pthread_mutex_t	death_mutex;
+	int				completed_meals;
+}	t_state;
+
 // Philosopher struct
 typedef struct s_philo
 {
@@ -34,6 +41,7 @@ typedef struct s_philo
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	struct s_seat	*seat;
+	t_state			*state;
 }	t_philo;
 
 // Circular linked list node to form the round table
@@ -41,8 +49,6 @@ typedef struct s_seat
 {
 	t_philo			*philosopher;
 	struct s_seat	*next;
-	pthread_mutex_t	death_mutex;
-	bool			has_died;
 }	t_seat;
 
 int		ft_atoi(const char *str);
