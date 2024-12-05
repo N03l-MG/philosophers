@@ -6,13 +6,13 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/04 16:50:09 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/05 17:03:41 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-t_philo	*create_philo(char **args, int goal, int i, pthread_mutex_t *left_fork);
+t_philo	*create_philo(char **args, int goal, int i, pthread_mutex_t *left_fork, t_seat *seat);
 t_seat	*init_philo(int philo_num, char **args, int goal);
 void	*philo_routine(void *arg);
 void	start(t_seat *table, int num_philosophers);
@@ -42,7 +42,7 @@ int	main(int argc, char *argv[])
 	return (0);
 }
 
-t_philo	*create_philo(char **args, int goal, int i, pthread_mutex_t *left_fork)
+t_philo	*create_philo(char **args, int goal, int i, pthread_mutex_t *left_fork, t_seat *seat)
 {
 	t_philo	*philosopher;
 
@@ -57,6 +57,7 @@ t_philo	*create_philo(char **args, int goal, int i, pthread_mutex_t *left_fork)
 	philosopher->left_fork = left_fork;
 	philosopher->right_fork = NULL;
 	philosopher->last_meal_time = current_time_ms();
+	philosopher->seat = seat;
 	return (philosopher);
 }
 
@@ -83,9 +84,11 @@ t_seat	*init_philo(int philo_num, char **args, int goal)
 		current = malloc(sizeof(t_seat));
 		if (!current)
 			return (NULL);
-		current->philosopher = create_philo(args, goal, i, &forks[i]);
+		current->philosopher = create_philo(args, goal, i, &forks[i], current);
 		if (!current->philosopher)
 			return (NULL);
+		pthread_mutex_init(&current->death_mutex, NULL);
+		current->has_died = false;
 		if (!first)
 			first = current;
 		if (prev)
@@ -106,15 +109,30 @@ t_seat	*init_philo(int philo_num, char **args, int goal)
 void	*philo_routine(void *arg)
 {
 	t_philo	*philo;
+	t_seat	*seat;
 	long	current_time;
 
 	philo = (t_philo *)arg;
+	seat = philo->seat;
 	while (philo->eat_counter != 0)
 	{
+		pthread_mutex_lock(&seat->death_mutex);
+		if (seat->has_died)
+		{
+			pthread_mutex_unlock(&seat->death_mutex);
+			pthread_exit(NULL);
+		}
+		pthread_mutex_unlock(&seat->death_mutex);
 		current_time = current_time_ms();
 		if (current_time - philo->last_meal_time > philo->time_to_die)
 		{
-			printf("%ld %d died\n", current_time, philo->philo_id);
+			pthread_mutex_lock(&seat->death_mutex);
+			if (!seat->has_died)
+			{
+				seat->has_died = true;
+				printf("%ld %d died\n", current_time, philo->philo_id);
+			}
+			pthread_mutex_unlock(&seat->death_mutex);
 			pthread_exit(NULL);
 		}
 		printf("%ld %d is thinking\n", current_time, philo->philo_id);
@@ -135,7 +153,7 @@ void	*philo_routine(void *arg)
 		}
 		current_time = current_time_ms();
 		printf("%ld %d is eating\n", current_time, philo->philo_id);
-		philo->last_meal_time = current_time_ms();
+		philo->last_meal_time = current_time;
 		usleep(philo->time_to_eat * 1000);
 		if (philo->eat_counter > 0)
 			philo->eat_counter--;
@@ -148,27 +166,40 @@ void	*philo_routine(void *arg)
 	return (NULL);
 }
 
-void	start(t_seat *table, int num_philosophers)
+void start(t_seat *table, int num_philosophers)
 {
-	pthread_t	*threads;
-	t_seat		*current;
-	int			i;
+	pthread_t *threads;
+	t_seat *current;
+	int i;
 
 	threads = malloc(sizeof(pthread_t) * num_philosophers);
 	if (!threads)
-	{
-		printf("Failed to allocate memory for threads\n");
 		return ;
-	}
 	current = table;
-	i = -1;
-	while (++i < num_philosophers)
+	for (i = 0; i < num_philosophers; i++)
 	{
 		pthread_create(&threads[i], NULL, philo_routine, current->philosopher);
 		current = current->next;
 	}
-	i = -1;
-	while (++i < num_philosophers)
-		pthread_join(threads[i], NULL);
-	free(threads);
+	while (1)
+	{
+		current = table;
+		for (i = 0; i < num_philosophers; i++)
+		{
+			pthread_mutex_lock(&current->death_mutex);
+			if (current->has_died)
+			{
+				pthread_mutex_unlock(&current->death_mutex);
+				for (int j = 0; j < num_philosophers; j++)
+					pthread_cancel(threads[j]);
+				for (int j = 0; j < num_philosophers; j++)
+					pthread_join(threads[j], NULL);
+				free(threads);
+				return ;
+			}
+			pthread_mutex_unlock(&current->death_mutex);
+			current = current->next;
+		}
+		usleep(1000);
+	}
 }

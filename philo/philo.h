@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:17 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/04 16:29:31 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/05 16:56:35 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct s_philo
 	int				eat_counter;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
+	struct s_seat	*seat;
 }	t_philo;
 
 // Circular linked list node to form the round table
@@ -40,6 +41,8 @@ typedef struct s_seat
 {
 	t_philo			*philosopher;
 	struct s_seat	*next;
+	pthread_mutex_t	death_mutex;
+	bool			has_died;
 }	t_seat;
 
 int		ft_atoi(const char *str);
