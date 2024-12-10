@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:17 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/10 17:19:44 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/10 19:17:11 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,12 @@ typedef struct s_seat
 	bool			has_died;
 }	t_seat;
 
+typedef struct s_routine_args
+{
+	t_philo	*philo;
+	long	start_time;
+}	t_routine_args;
+
 // Util functions
 int		ft_atoi(const char *str);
 t_seat	*ft_lstnew(void *content);
@@ -66,7 +72,8 @@ long	current_time_ms(void);
 // Philo functions
 t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat);
 void	give_forks(t_seat *prev, t_seat *current);
-void	monitoring(t_seat *table, t_seat *current, pthread_t *threads, int n);
+void	monitoring(t_seat *table, pthread_t *threads, int n);
 void	*philo_routine(void *arg);
+void	free_resources(t_seat *table, int n);
 
 #endif

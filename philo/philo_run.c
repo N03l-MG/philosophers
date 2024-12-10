@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 15:15:05 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/10 17:20:26 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/10 19:19:43 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,94 +14,100 @@
 
 static void	die(t_philo *philo, t_seat *seat, long current_time);
 static void	eat(t_philo *philo, long current_time);
+static void	log_action(long start_time, t_philo *philo, t_action action);
 
-void	monitoring(t_seat *table, t_seat *current, pthread_t *threads, int n)
+void	monitoring(t_seat *table, pthread_t *threads, int n)
 {
-	int	i;
-	int	j;
+	t_seat	*current;
+	int		i;
+	int		j;
 
-	current = table;
-	i = -1;
-	j = -1;
-	while (++i < n)
+	while (true)
 	{
-		pthread_mutex_lock(&current->death_mutex);
-		if (current->has_died)
+		current = table;
+		i = -1;
+		j = -1;
+		while (++i < n)
 		{
+			pthread_mutex_lock(&current->death_mutex);
+			if (current->has_died)
+			{
+				pthread_mutex_unlock(&current->death_mutex);
+				while (++j < n)
+					pthread_join(threads[j], NULL);
+				free_resources(table, n);
+				return ;
+			}
 			pthread_mutex_unlock(&current->death_mutex);
-			while (++j < n)
-				pthread_cancel(threads[j]);
-			j = -1;
-			while (++j < n)
-				pthread_join(threads[j], NULL);
-			free(threads);
-			return ;
+			current = current->next;
 		}
-		pthread_mutex_unlock(&current->death_mutex);
-		current = current->next;
 	}
 }
 
-void	*philo_routine(void *arg)
+void	*philo_routine(void *arg) // TODO: fix god forsaken norm for the billionth time
 {
-	t_philo	*philo;
-	t_seat	*seat;
-	long	current_time;
+	t_routine_args	*args = (t_routine_args *)arg;
+	t_philo			*philo = args->philo;
+	t_seat			*seat = philo->seat;
+	long			start_time = args->start_time;
+	long			current_time;
 
-	philo = (t_philo *)arg;
-	seat = philo->seat;
 	while (philo->eat_counter != 0)
 	{
 		pthread_mutex_lock(&seat->death_mutex);
 		if (seat->has_died)
 		{
 			pthread_mutex_unlock(&seat->death_mutex);
-			pthread_exit(NULL);
+			free(args);
+			return (NULL);
 		}
 		pthread_mutex_unlock(&seat->death_mutex);
 		current_time = current_time_ms();
 		if (current_time - philo->last_meal_time > philo->time_to_die)
-			die(philo, seat, current_time);
-		printf("%ld %d is thinking\n", current_time, philo->philo_id);
-		eat(philo, current_time);
-		current_time = current_time_ms();
-		printf("%ld %d is sleeping\n", current_time, philo->philo_id);
+		{
+			die(philo, seat, start_time);
+			free(args);
+			return (NULL);
+		}
+		log_action(start_time, philo, THINK);
+		eat(philo, start_time);
+		log_action(start_time, philo, SLEEP);
 		usleep(philo->time_to_sleep * 1000);
 	}
+	free(args);
 	return (NULL);
 }
 
-static void	die(t_philo *philo, t_seat *seat, long current_time)
+static void	die(t_philo *philo, t_seat *seat, long start_time)
 {
 	pthread_mutex_lock(&seat->death_mutex);
 	if (!seat->has_died)
 	{
 		seat->has_died = true;
-		printf("%ld %d died\n", current_time, philo->philo_id);
+		log_action(start_time, philo, DIE);
 	}
 	pthread_mutex_unlock(&seat->death_mutex);
 	pthread_exit(NULL);
 }
 
-static void	eat(t_philo *philo, long current_time)
+static void	eat(t_philo *philo, long start_time)
 {
 	if (philo->philo_id % 2 == 0)
 	{
 		pthread_mutex_lock(philo->left_fork);
-		printf("%ld %d has taken a fork\n", current_time, philo->philo_id);
+		log_action(start_time, philo, FORK);
 		pthread_mutex_lock(philo->right_fork);
-		printf("%ld %d has taken a fork\n", current_time, philo->philo_id);
+		log_action(start_time, philo, FORK);
 	}
 	else
 	{
 		pthread_mutex_lock(philo->right_fork);
-		printf("%ld %d has taken a fork\n", current_time, philo->philo_id);
+		log_action(start_time, philo, FORK);
 		pthread_mutex_lock(philo->left_fork);
-		printf("%ld %d has taken a fork\n", current_time, philo->philo_id);
+		log_action(start_time, philo, FORK);
 	}
-	current_time = current_time_ms();
-	printf("%ld %d is eating\n", current_time, philo->philo_id);
-	philo->last_meal_time = current_time;
+	log_action(start_time, philo, EAT);
+	philo->last_meal_time = current_time_ms();
 	usleep(philo->time_to_eat * 1000);
 	if (philo->eat_counter > 0)
 		philo->eat_counter--;
@@ -109,8 +115,19 @@ static void	eat(t_philo *philo, long current_time)
 	pthread_mutex_unlock(philo->left_fork);
 }
 
-static void	log_action(long start_time, int philo_id, t_action action) // I have a plan...
+static void	log_action(long start_time, t_philo *philo, t_action action)
 {
-	long	timestamp = current_time_ms() - start_time;
-	printf("%ld %d %s\n", timestamp, philo_id, action);
+	long	timestamp;	
+
+	timestamp = current_time_ms() - start_time;
+	if (action == DIE)
+		printf("%ld %d died\n", timestamp, philo->philo_id);
+	else if (action == FORK)
+		printf("%ld %d has taken a fork\n", timestamp, philo->philo_id);
+	else if (action == EAT)
+		printf("%ld %d is eating\n", timestamp, philo->philo_id);
+	else if (action == THINK)
+		printf("%ld %d is thinking\n", timestamp, philo->philo_id);
+	else if (action == SLEEP)
+		printf("%ld %d is sleeping\n", timestamp, philo->philo_id);
 }

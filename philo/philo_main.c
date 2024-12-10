@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/10 17:14:26 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/10 18:51:52 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static t_seat	*init_philo(int philo_num, char **args, int goal);
 static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n);
-static void		run_philo(t_seat *table, int num_philosophers);
+static void		run_philo(t_seat *table, int philo_num, long start_time);
 
 int	main(int argc, char *argv[])
 {
@@ -39,7 +39,7 @@ int	main(int argc, char *argv[])
 		printf("Failed to initialize philosophers\n");
 		return (1);
 	}
-	run_philo(table, ft_atoi(argv[1]));
+	run_philo(table, ft_atoi(argv[1]), start_time);
 	return (0);
 }
 
@@ -88,11 +88,12 @@ static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n)
 	return (first);
 }
 
-static void	run_philo(t_seat *table, int philo_num)
+static void	run_philo(t_seat *table, int philo_num, long start_time)
 {
-	pthread_t	*threads;
-	t_seat		*current;
-	int			i;
+	pthread_t		*threads;
+	t_routine_args	*args;
+	t_seat			*current;
+	int				i;
 
 	threads = malloc(sizeof(pthread_t) * philo_num);
 	if (!threads)
@@ -101,9 +102,15 @@ static void	run_philo(t_seat *table, int philo_num)
 	i = -1;
 	while (++i < philo_num)
 	{
-		pthread_create(&threads[i], NULL, philo_routine, current->philo);
+		args = malloc(sizeof(t_routine_args));
+		if (!args)
+			return ;
+		args->philo = current->philo;
+		args->start_time = start_time;
+		pthread_create(&threads[i], NULL, philo_routine, args);
 		current = current->next;
 	}
-	while (true)
-		monitoring(table, current, threads, philo_num);
+	monitoring(table, threads, philo_num);
+	free(threads);
 }
+

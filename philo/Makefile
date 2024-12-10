@@ -20,7 +20,7 @@ FLAGS = -Wall -Wextra -Werror
 ###############                    SOURCE FILES                  ###############
 ################################################################################
 
-SRCS = philo_main.c philo_run.c philo_utils.c
+SRCS = philo_main.c philo_run.c philo_utils.c philo_libfuncs.c
 
 OBJ = $(SRCS:.c=.o)
 

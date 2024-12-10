@@ -6,50 +6,11 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 15:19:34 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/10 16:57:05 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/10 19:17:16 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-int	ft_atoi(const char *str)
-{
-	int	result;
-	int	sign;
-	int	i;
-
-	result = 0;
-	sign = 1;
-	i = 0;
-	while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n'
-		|| str[i] == '\v' || str[i] == '\f' || str[i] == '\r')
-		i++;
-	if (str[i] == '-')
-	{
-		sign = -1;
-		i++;
-	}
-	else if (str[i] == '+')
-		i++;
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		result = result * 10 + (str[i] - '0');
-		i++;
-	}
-	return (sign * result);
-}
-
-t_seat	*ft_lstnew(void *content)
-{
-	t_seat	*list;
-
-	list = (t_seat *)malloc(sizeof(t_seat));
-	if (!list)
-		return (NULL);
-	list->philo = content;
-	list->next = NULL;
-	return (list);
-}
 
 long	current_time_ms(void)
 {
@@ -82,4 +43,22 @@ void	give_forks(t_seat *prev, t_seat *current)
 {
 	prev->next = current;
 	current->philo->right_fork = prev->philo->left_fork;
+}
+
+void	free_resources(t_seat *table, int n)
+{
+	t_seat	*current;
+	t_seat	*temp;
+	int		i;
+
+	current = table;
+	i = 0;
+	while (i++ < n)
+	{
+		temp = current->next;
+		pthread_mutex_destroy(&current->death_mutex);
+		free(current->philo);
+		free(current);
+		current = temp;
+	}
 }
