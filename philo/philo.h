@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:17 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/05 16:56:35 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/10 17:19:44 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,18 @@
 # include <pthread.h>
 # include <sys/time.h>
 
-typedef struct s_state
+# ifndef MUTEX // Because its length was Fing up my norm.
+#  define MUTEX pthread_mutex_t
+# endif
+
+typedef enum e_actions
 {
-	bool			has_died;
-	pthread_mutex_t	death_mutex;
-	int				completed_meals;
-}	t_state;
+	DIE,
+	FORK,
+	EAT,
+	THINK,
+	SLEEP
+}	t_action;
 
 // Philosopher struct
 typedef struct s_philo
@@ -38,21 +44,29 @@ typedef struct s_philo
 	int				time_to_sleep;
 	long			last_meal_time;
 	int				eat_counter;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
+	MUTEX			*left_fork;
+	MUTEX			*right_fork;
 	struct s_seat	*seat;
-	t_state			*state;
 }	t_philo;
 
 // Circular linked list node to form the round table
 typedef struct s_seat
 {
-	t_philo			*philosopher;
+	t_philo			*philo;
 	struct s_seat	*next;
+	MUTEX			death_mutex;
+	bool			has_died;
 }	t_seat;
 
+// Util functions
 int		ft_atoi(const char *str);
 t_seat	*ft_lstnew(void *content);
 long	current_time_ms(void);
+
+// Philo functions
+t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat);
+void	give_forks(t_seat *prev, t_seat *current);
+void	monitoring(t_seat *table, t_seat *current, pthread_t *threads, int n);
+void	*philo_routine(void *arg);
 
 #endif
