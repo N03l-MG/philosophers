@@ -65,3 +65,20 @@ void	free_resources(t_seat *table, int n)
 		current = temp;
 	}
 }
+
+void	log_action(long start_time, t_philo *philo, t_action action)
+{
+	long	timestamp;	
+
+	timestamp = current_time_ms() - start_time;
+	if (action == DIE)
+		printf("%ld %d died\n", timestamp, philo->philo_id);
+	else if (action == FORK)
+		printf("%ld %d has taken a fork\n", timestamp, philo->philo_id);
+	else if (action == EAT)
+		printf("%ld %d is eating\n", timestamp, philo->philo_id);
+	else if (action == THINK)
+		printf("%ld %d is thinking\n", timestamp, philo->philo_id);
+	else if (action == SLEEP)
+		printf("%ld %d is sleeping\n", timestamp, philo->philo_id);
+}
