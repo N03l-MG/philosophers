@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 15:19:34 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/10 19:17:16 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/11 17:01:41 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,11 @@ void	free_resources(t_seat *table, int n)
 	{
 		temp = current->next;
 		pthread_mutex_destroy(&current->death_mutex);
+		pthread_mutex_destroy(&current->start_mutex);
 		free(current->philo);
+		current->philo = NULL;
 		free(current);
+		current = NULL;
 		current = temp;
 	}
 }

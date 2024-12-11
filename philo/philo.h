@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:17 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/10 19:17:11 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/11 16:48:36 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ typedef struct s_seat
 	t_philo			*philo;
 	struct s_seat	*next;
 	MUTEX			death_mutex;
+	MUTEX			start_mutex;
+	bool			start;
 	bool			has_died;
 }	t_seat;
 

@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/10 18:51:52 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/11 16:53:28 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n)
 		current->philo = create_philo(args, g_i, &forks[i], current);
 		pthread_mutex_init(&current->death_mutex, NULL);
 		current->has_died = false;
+		pthread_mutex_init(&current->start_mutex, NULL);
+		current->start = false;
 		if (!first)
 			first = current;
 		if (prev)
@@ -110,7 +112,15 @@ static void	run_philo(t_seat *table, int philo_num, long start_time)
 		pthread_create(&threads[i], NULL, philo_routine, args);
 		current = current->next;
 	}
+	current = table;
+	i = -1;
+	while (++i < philo_num)
+	{
+		pthread_mutex_lock(&current->start_mutex);
+		current->start = true;
+		pthread_mutex_unlock(&current->start_mutex);
+		current = current->next;
+	}
 	monitoring(table, threads, philo_num);
 	free(threads);
 }
-
