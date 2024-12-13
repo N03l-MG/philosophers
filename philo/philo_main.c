@@ -29,8 +29,8 @@ int	main(int argc, char *argv[])
 		meal_goal = ft_atoi(argv[5]);
 	else
 	{
-		printf("Invalid Arguments: n of phil, die time, eat time, sleep time,");
-		printf(" (optional) eating goal\n");
+		printf("Invalid Arguments: n of phil, die time, eat time, sleep time,"
+			" (optional) eating goal\n");
 		return (1);
 	}
 	table = init_philo(ft_atoi(argv[1]), argv + 1, meal_goal);
@@ -79,12 +79,10 @@ static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n)
 		current->has_died = false;
 		if (!first)
 			first = current;
-		if (prev)
-			give_forks(prev, current);
+		give_forks(prev, current);
 		prev = current;
 	}
-	if (prev)
-		give_forks(prev, first);
+	give_forks(prev, first);
 	return (first);
 }
 

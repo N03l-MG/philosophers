@@ -29,14 +29,13 @@ void	*philo_routine(void *arg)
 		if (death_check(args))
 			return (NULL);
 		log_action(args->start_time, philo, THINK);
+		if (death_check(args))
+			return (NULL);
 		eat(philo, args->start_time);
 		if (death_check(args))
 			return (NULL);
 		log_action(args->start_time, philo, SLEEP);
 		usleep(philo->time_to_sleep * 1000);
-		if (death_check(args))
-			return (NULL);
-		think(args, philo);
 		if (death_check(args))
 			return (NULL);
 	}
@@ -112,21 +111,4 @@ static void	eat(t_philo *philo, long start_time)
 		philo->eat_counter--;
 	pthread_mutex_unlock(philo->right_fork);
 	pthread_mutex_unlock(philo->left_fork);
-}
-
-static void	think(t_routine_args *args, t_philo *philo)
-{
-	long		current_time;
-	long		think_time;
-
-	current_time = current_time_ms();
-	think_time = philo->time_to_die
-		- (current_time - philo->last_meal_time) - philo->time_to_eat;
-	if (think_time > 0)
-	{
-		log_action(args->start_time, philo, THINK);
-		usleep(think_time * 1000);
-	}
-	else
-		log_action(args->start_time, philo, THINK);
 }

@@ -41,8 +41,11 @@ t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat)
 
 void	give_forks(t_seat *prev, t_seat *current)
 {
-	prev->next = current;
-	current->philo->right_fork = prev->philo->left_fork;
+	if (prev)
+	{
+		prev->next = current;
+		current->philo->right_fork = prev->philo->left_fork;
+	}
 }
 
 void	free_resources(t_seat *table, int n)
