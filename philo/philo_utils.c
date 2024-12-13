@@ -57,7 +57,6 @@ void	free_resources(t_seat *table, int n)
 	{
 		temp = current->next;
 		pthread_mutex_destroy(&current->death_mutex);
-		pthread_mutex_destroy(&current->start_mutex);
 		free(current->philo);
 		current->philo = NULL;
 		free(current);
@@ -66,23 +65,13 @@ void	free_resources(t_seat *table, int n)
 	}
 }
 
-void	log_action(long start, t_philo *philo, t_action action, bool death)
+void	log_action(long start_time, t_philo *philo, t_action action)
 {
-	long	timestamp;
-	t_seat	*seat;
+	long	timestamp;	
 
-	seat = philo->seat;
-	if (!death)
-		pthread_mutex_lock(&seat->death_mutex);
-	if (seat->has_died)
-	{
-		if (!death)
-			pthread_mutex_unlock(&seat->death_mutex);
+	timestamp = current_time_ms() - start_time;
+	if (philo->seat->has_died)
 		return ;
-	}
-	if (!death)
-		pthread_mutex_unlock(&seat->death_mutex);
-	timestamp = current_time_ms() - start;
 	if (action == DIE)
 		printf("%ld %d died\n", timestamp, philo->philo_id);
 	else if (action == FORK)

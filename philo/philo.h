@@ -55,8 +55,6 @@ typedef struct s_seat
 	t_philo			*philo;
 	struct s_seat	*next;
 	MUTEX			death_mutex;
-	MUTEX			start_mutex;
-	bool			start;
 	bool			has_died;
 }	t_seat;
 
@@ -64,6 +62,7 @@ typedef struct s_routine_args
 {
 	t_philo	*philo;
 	long	start_time;
+	int		philo_n;
 }	t_routine_args;
 
 // Util functions
@@ -74,9 +73,9 @@ long	current_time_ms(void);
 // Philo functions
 t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat);
 void	give_forks(t_seat *prev, t_seat *current);
-void	monitoring(t_seat *table, pthread_t *threads, int n);
+void	monitoring(t_seat *table, pthread_t *threads, int philo_n);
 void	*philo_routine(void *arg);
 void	free_resources(t_seat *table, int n);
-void	log_action(long start_time, t_philo *philo, t_action action, bool death);
+void	log_action(long start_time, t_philo *philo, t_action action);
 
 #endif

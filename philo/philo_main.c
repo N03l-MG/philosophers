@@ -77,8 +77,6 @@ static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n)
 		current->philo = create_philo(args, g_i, &forks[i], current);
 		pthread_mutex_init(&current->death_mutex, NULL);
 		current->has_died = false;
-		pthread_mutex_init(&current->start_mutex, NULL);
-		current->start = false;
 		if (!first)
 			first = current;
 		if (prev)
@@ -109,16 +107,8 @@ static void	run_philo(t_seat *table, int philo_num, long start_time)
 			return ;
 		args->philo = current->philo;
 		args->start_time = start_time;
+		args->philo_n = philo_num;
 		pthread_create(&threads[i], NULL, philo_routine, args);
-		current = current->next;
-	}
-	current = table;
-	i = -1;
-	while (++i < philo_num)
-	{
-		pthread_mutex_lock(&current->start_mutex);
-		current->start = true;
-		pthread_mutex_unlock(&current->start_mutex);
 		current = current->next;
 	}
 	monitoring(table, threads, philo_num);
