@@ -6,19 +6,11 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 15:19:34 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/11 17:01:41 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:28:17 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-long	current_time_ms(void)
-{
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-}
 
 t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat)
 {
@@ -60,7 +52,7 @@ void	free_resources(t_seat *table, int n)
 	{
 		temp = current->next;
 		pthread_mutex_destroy(&current->death_mutex);
-		free(current->philo->left_fork);
+		pthread_mutex_destroy(current->philo->left_fork);
 		free(current->philo);
 		free(current);
 		current = NULL;
@@ -70,7 +62,7 @@ void	free_resources(t_seat *table, int n)
 
 void	log_action(long start_time, t_philo *philo, t_action action)
 {
-	long	timestamp;	
+	long	timestamp;
 
 	timestamp = current_time_ms() - start_time;
 	if (philo->seat->has_died)

@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/11 16:53:28 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:44:24 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@ static t_seat	*init_philo(int philo_num, char **args, int goal);
 static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n);
 static void		run_philo(t_seat *table, int philo_num, long start_time);
 
+void	leaks(void)
+{
+	system("leaks philo");
+}
+
 int	main(int argc, char *argv[])
 {
 	t_seat	*table;
@@ -23,14 +28,14 @@ int	main(int argc, char *argv[])
 	long	start_time;
 
 	start_time = current_time_ms();
-	if (argc == 5)
+	if (argc == 5 && ft_atoi(argv[1]) != 0)
 		meal_goal = -1;
-	else if (argc == 6)
+	else if (argc == 6 && ft_atoi(argv[1]) != 0)
 		meal_goal = ft_atoi(argv[5]);
 	else
 	{
-		printf("Invalid Arguments: n of phil, die time, eat time, sleep time,"
-			" (optional) eating goal\n");
+		printf("Invalid Arguments: n of phil (min 1), die time, eat time, "
+			"sleep time, (optional) eating goal\n");
 		return (1);
 	}
 	table = init_philo(ft_atoi(argv[1]), argv + 1, meal_goal);
@@ -40,6 +45,7 @@ int	main(int argc, char *argv[])
 		return (1);
 	}
 	run_philo(table, ft_atoi(argv[1]), start_time);
+	atexit(leaks);
 	return (0);
 }
 

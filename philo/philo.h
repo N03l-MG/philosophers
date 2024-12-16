@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:17 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/11 16:48:36 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/16 16:14:55 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ typedef struct s_seat
 int		ft_atoi(const char *str);
 t_seat	*ft_lstnew(void *content);
 long	current_time_ms(void);
+void	ft_usleep(long duration_ms);
 
 // Philo functions
 t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat);

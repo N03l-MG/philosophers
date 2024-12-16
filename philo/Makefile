@@ -14,13 +14,13 @@
 
 NAME = philo
 CC = cc
-FLAGS = -Wall -Wextra -Werror -g -fsanitize=thread
+FLAGS = -Wall -Wextra -Werror # -fsanitize=thread
 
 ################################################################################
 ###############                    SOURCE FILES                  ###############
 ################################################################################
 
-SRCS = philo_main.c philo_run.c philo_utils.c philo_libfuncs.c philo_monitor.c
+SRCS = philo_main.c philo_routine.c philo_utils.c philo_libfuncs.c philo_monitor.c philo_time.c
 
 OBJ = $(SRCS:.c=.o)
 
@@ -30,8 +30,8 @@ OBJ = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) -lpthread
+$(NAME): $(OBJ) # -lpthread
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) 
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)

@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/13 15:05:24 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/13 18:41:33 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/16 15:46:59 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	monitoring(t_seat *table, pthread_t *threads, int philo_n)
 			{
 				while (++j < philo_n)
 					pthread_detach(threads[j]);
-				//free_resources(table, philo_n);
+				free_resources(table, philo_n);
 				return ;
 			}
 			pthread_mutex_unlock(&current->death_mutex);
@@ -95,5 +95,5 @@ static void	join_all_philos(t_seat *table, pthread_t *threads, int philo_n)
 		free(current->args);
 		current = current->next;
 	}
-	//free_resources(table, philo_n);
+	free_resources(table, philo_n);
 }
