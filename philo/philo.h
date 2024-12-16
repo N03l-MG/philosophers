@@ -49,6 +49,13 @@ typedef struct s_philo
 	struct s_seat	*seat;
 }	t_philo;
 
+typedef struct s_routine_args
+{
+	t_philo	*philo;
+	long	start_time;
+	int		philo_n;
+}	t_routine_args;
+
 // Circular linked list node to form the round table
 typedef struct s_seat
 {
@@ -56,14 +63,8 @@ typedef struct s_seat
 	struct s_seat	*next;
 	MUTEX			death_mutex;
 	bool			has_died;
+	t_routine_args	*args;
 }	t_seat;
-
-typedef struct s_routine_args
-{
-	t_philo	*philo;
-	long	start_time;
-	int		philo_n;
-}	t_routine_args;
 
 // Util functions
 int		ft_atoi(const char *str);

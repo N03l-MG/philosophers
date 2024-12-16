@@ -13,6 +13,8 @@
 #include "philo.h"
 
 static bool	check_all_finished(t_seat *table, int philo_n);
+static bool	death_check(t_routine_args	*args);
+static void	join_all_philos(t_seat *table, pthread_t *threads, int philo_n);
 
 void	monitoring(t_seat *table, pthread_t *threads, int philo_n)
 {
@@ -28,19 +30,38 @@ void	monitoring(t_seat *table, pthread_t *threads, int philo_n)
 		while (++i < philo_n)
 		{
 			pthread_mutex_lock(&current->death_mutex);
-			if (current->has_died)
+			if (death_check(current->args))
 			{
 				while (++j < philo_n)
 					pthread_detach(threads[j]);
-				free_resources(table, philo_n);
+				//free_resources(table, philo_n);
 				return ;
 			}
 			pthread_mutex_unlock(&current->death_mutex);
 			current = current->next;
 		}
 		if (check_all_finished(table, philo_n))
-			return ;
+			return (join_all_philos(table, threads, philo_n));
 	}
+}
+
+static bool	death_check(t_routine_args	*args)
+{
+	long	current_time;
+	t_philo	*philo;
+	t_seat	*seat;
+
+	philo = args->philo;
+	seat = philo->seat;
+	current_time = current_time_ms();
+	if (current_time - philo->last_meal_time >= philo->time_to_die)
+	{
+		log_action(args->start_time, philo, DIE);
+		seat->has_died = true;
+		free(args);
+		return (true);
+	}
+	return (false);
 }
 
 static bool	check_all_finished(t_seat *table, int philo_n)
@@ -59,4 +80,20 @@ static bool	check_all_finished(t_seat *table, int philo_n)
 		current = current->next;
 	}
 	return (finished == philo_n);
+}
+
+static void	join_all_philos(t_seat *table, pthread_t *threads, int philo_n)
+{
+	int		i;
+	t_seat	*current;
+
+	i = -1;
+	current = table;
+	while (++i < philo_n)
+	{
+		pthread_join(threads[i], NULL);
+		free(current->args);
+		current = current->next;
+	}
+	//free_resources(table, philo_n);
 }

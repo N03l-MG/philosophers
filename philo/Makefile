@@ -14,7 +14,7 @@
 
 NAME = philo
 CC = cc
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -g -fsanitize=thread
 
 ################################################################################
 ###############                    SOURCE FILES                  ###############

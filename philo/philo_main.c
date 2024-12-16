@@ -106,6 +106,7 @@ static void	run_philo(t_seat *table, int philo_num, long start_time)
 		args->philo = current->philo;
 		args->start_time = start_time;
 		args->philo_n = philo_num;
+		current->args = args;
 		pthread_create(&threads[i], NULL, philo_routine, args);
 		current = current->next;
 	}

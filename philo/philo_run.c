@@ -12,10 +12,7 @@
 
 #include "philo.h"
 
-static bool	death_check(t_routine_args	*args);
-static void	die(t_philo *philo, t_seat *seat, long current_time, int philo_n);
-static void	eat(t_philo *philo, long current_time);
-static void	think(t_routine_args *args, t_philo *philo);
+static void	eat(t_philo *philo, long current_time, t_routine_args *args);
 
 void	*philo_routine(void *arg)
 {
@@ -24,72 +21,23 @@ void	*philo_routine(void *arg)
 
 	args = (t_routine_args *)arg;
 	philo = args->philo;
+	if (philo->philo_id % 2 == 0)
+		eat(philo, args->start_time, args);
 	while (philo->eat_counter != 0)
 	{
-		if (death_check(args))
-			return (NULL);
-		log_action(args->start_time, philo, THINK);
-		if (death_check(args))
-			return (NULL);
-		eat(philo, args->start_time);
-		if (death_check(args))
-			return (NULL);
 		log_action(args->start_time, philo, SLEEP);
 		usleep(philo->time_to_sleep * 1000);
-		if (death_check(args))
-			return (NULL);
+		log_action(args->start_time, philo, THINK);
+		eat(philo, args->start_time, args);
 	}
-	free(args);
+	log_action(args->start_time, philo, THINK);
 	return (NULL);
 }
 
-static bool	death_check(t_routine_args	*args)
+static void	eat(t_philo *philo, long start_time, t_routine_args *args)
 {
-	long	current_time;
-	t_philo	*philo;
-	t_seat	*seat;
-	int		i;
-
-	philo = args->philo;
-	seat = philo->seat;
-	current_time = current_time_ms();
-	pthread_mutex_lock(&seat->death_mutex);
-	i = -1;
-	while (++i < args->philo_n)
-	{
-		if (seat->has_died)
-			return (true);
-		seat = seat->next;
-	}
-	pthread_mutex_unlock(&seat->death_mutex);
-	if (current_time - philo->last_meal_time >= philo->time_to_die)
-	{
-		die(philo, seat, args->start_time, args->philo_n);
-		free(args);
-		return (true);
-	}
-	return (false);
-}
-
-static void	die(t_philo *philo, t_seat *seat, long start_time, int philo_n)
-{
-	int	i;
-
-	i = -1;
-	pthread_mutex_lock(&seat->death_mutex);
-	log_action(start_time, philo, DIE);
-	while (++i < philo_n)
-	{
-		if (!seat->has_died)
-			seat->has_died = true;
-		seat = seat->next;
-	}
-	pthread_mutex_unlock(&seat->death_mutex);
-	return ;
-}
-
-static void	eat(t_philo *philo, long start_time)
-{
+	if (philo->right_fork == philo->left_fork)
+		return ;
 	if (philo->philo_id % 2 == 0)
 	{
 		pthread_mutex_lock(philo->left_fork);

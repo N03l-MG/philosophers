@@ -27,7 +27,7 @@ t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat)
 	philosopher = malloc(sizeof(t_philo));
 	if (!philosopher)
 		return (NULL);
-	philosopher->philo_id = g_and_i[1];
+	philosopher->philo_id = g_and_i[1] + 1;
 	philosopher->time_to_die = ft_atoi(args[1]);
 	philosopher->time_to_eat = ft_atoi(args[2]);
 	philosopher->time_to_sleep = ft_atoi(args[3]);
@@ -60,8 +60,8 @@ void	free_resources(t_seat *table, int n)
 	{
 		temp = current->next;
 		pthread_mutex_destroy(&current->death_mutex);
+		free(current->philo->left_fork);
 		free(current->philo);
-		current->philo = NULL;
 		free(current);
 		current = NULL;
 		current = temp;
