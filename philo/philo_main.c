@@ -16,10 +16,10 @@ static t_seat	*init_philo(int philo_num, char **args, int goal, MUTEX	*forks);
 static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n);
 static void		run_philo(t_seat *table, int philo_num, long start_time);
 
-void	leaks(void)
-{
-	system("leaks philo");
-}
+// void	leaks(void)
+// {
+// 	system("leaks philo");
+// }
 
 int	main(int argc, char *argv[])
 {
