@@ -52,6 +52,8 @@ void	free_resources(t_seat *table, int n)
 	{
 		temp = current->next;
 		pthread_mutex_destroy(&current->death_mutex);
+		pthread_mutex_lock(current->philo->left_fork);
+		pthread_mutex_unlock(current->philo->left_fork);
 		pthread_mutex_destroy(current->philo->left_fork);
 		free(current->philo);
 		free(current);

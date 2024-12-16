@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-static t_seat	*init_philo(int philo_num, char **args, int goal);
+static t_seat	*init_philo(int philo_num, char **args, int goal, MUTEX	*forks);
 static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n);
 static void		run_philo(t_seat *table, int philo_num, long start_time);
 
@@ -26,6 +26,7 @@ int	main(int argc, char *argv[])
 	t_seat	*table;
 	int		meal_goal;
 	long	start_time;
+	MUTEX	*forks;
 
 	start_time = current_time_ms();
 	if (argc == 5 && ft_atoi(argv[1]) != 0)
@@ -38,26 +39,18 @@ int	main(int argc, char *argv[])
 			"sleep time, (optional) eating goal\n");
 		return (1);
 	}
-	table = init_philo(ft_atoi(argv[1]), argv + 1, meal_goal);
-	if (!table)
-	{
-		printf("Failed to initialize philosophers\n");
-		return (1);
-	}
+	forks = malloc(sizeof(MUTEX) * ft_atoi(argv[1]));
+	table = init_philo(ft_atoi(argv[1]), argv + 1, meal_goal, forks);
 	run_philo(table, ft_atoi(argv[1]), start_time);
-	//atexit(leaks);
+	free(forks);
 	return (0);
 }
 
-static t_seat	*init_philo(int philo_num, char **args, int goal)
+static t_seat	*init_philo(int philo_num, char **args, int goal, MUTEX	*forks)
 {
-	MUTEX	*forks;
 	int		i;
 
 	philo_num = ft_atoi(args[0]);
-	forks = malloc(sizeof(MUTEX) * philo_num);
-	if (!forks)
-		return (NULL);
 	i = -1;
 	while (++i < philo_num)
 		pthread_mutex_init(&forks[i], NULL);

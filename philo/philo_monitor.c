@@ -34,8 +34,8 @@ void	monitoring(t_seat *table, pthread_t *threads, int philo_n)
 			{
 				while (++j < philo_n)
 					pthread_detach(threads[j]);
-				free_resources(table, philo_n);
-				return ;
+				pthread_mutex_unlock(&current->death_mutex);
+				return (free_resources(table, philo_n));
 			}
 			pthread_mutex_unlock(&current->death_mutex);
 			current = current->next;
