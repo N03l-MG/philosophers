@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:17 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/16 16:14:55 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/16 17:08:00 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,11 @@
 # include <pthread.h>
 # include <sys/time.h>
 
-# ifndef MUTEX // Because its length was Fing up my norm.
+# ifndef MUTEX // Type shortening
 #  define MUTEX pthread_mutex_t
 # endif
 
+// Actions for logging
 typedef enum e_actions
 {
 	DIE,
@@ -49,6 +50,7 @@ typedef struct s_philo
 	struct s_seat	*seat;
 }	t_philo;
 
+// Arguments to be passed into each thread
 typedef struct s_routine_args
 {
 	t_philo	*philo;
@@ -69,15 +71,17 @@ typedef struct s_seat
 // Util functions
 int		ft_atoi(const char *str);
 t_seat	*ft_lstnew(void *content);
+void	free_resources(t_seat *table, int n);
+void	log_action(long start_time, t_philo *philo, t_action action);
+
+// Time funtions
 long	current_time_ms(void);
 void	ft_usleep(long duration_ms);
 
-// Philo functions
+// Philosopher functions
 t_philo	*create_philo(char **args, int *g_and_i, MUTEX *l_fork, t_seat *seat);
 void	give_forks(t_seat *prev, t_seat *current);
 void	monitoring(t_seat *table, pthread_t *threads, int philo_n);
 void	*philo_routine(void *arg);
-void	free_resources(t_seat *table, int n);
-void	log_action(long start_time, t_philo *philo, t_action action);
 
 #endif

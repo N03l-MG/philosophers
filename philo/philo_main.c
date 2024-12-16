@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/16 16:44:24 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/16 17:39:04 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	main(int argc, char *argv[])
 		return (1);
 	}
 	run_philo(table, ft_atoi(argv[1]), start_time);
-	atexit(leaks);
+	//atexit(leaks);
 	return (0);
 }
 
