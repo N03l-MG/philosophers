@@ -10,14 +10,14 @@ The unusual file structure, being a single folder containing all code named "phi
 
 The program is ran as such:
 ```
-	./philo [number of philosophers] [time to die] [time to eat] [time to sleep] [optional meal goal]
+./philo [number of philosophers] [time to die] [time to eat] [time to sleep] [optional meal goal]
 ```
 When no meal goal is provided the philosophers simply repeat their routine indefinitely until one of them dies. As soon as a death is detected, the program stops instantaneously.
 If there is a single philosopher on the table, there is only one fork and by extension it cannot eat and starves after its time to die elapses. If the number of philosophers is less than 1 or any necessary arguments are not passed the program throws an error message.
 
 The program logs the actions in the following format:
 ```
-	"[philosopher ID] [timestamp in ms] has/is [action]."
+[philosopher ID] [timestamp in ms] has/is [action].
 ```
 The logged actions are taking a fork, eating, sleeping, thinking and dying.
 
