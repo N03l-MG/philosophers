@@ -14,7 +14,7 @@
 
 NAME = philo
 CC = cc
-FLAGS = -Wall -Wextra -Werror #-fsanitize=thread #-fsanitize=address
+FLAGS = -Wall -Wextra -Werror #-fsanitize=thread
 
 ################################################################################
 ###############                    SOURCE FILES                  ###############
@@ -30,8 +30,8 @@ OBJ = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ) # -lpthread
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) 
+$(NAME): $(OBJ)
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) -lpthread
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)

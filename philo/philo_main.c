@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 12:33:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/16 17:39:04 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/17 16:01:38 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,6 @@
 static t_seat	*init_philo(int philo_num, char **args, int goal, MUTEX	*forks);
 static t_seat	*setup_table(char **args, MUTEX *forks, int goal, int n);
 static void		run_philo(t_seat *table, int philo_num, long start_time);
-
-// void	leaks(void)
-// {
-// 	system("leaks philo");
-// }
 
 int	main(int argc, char *argv[])
 {

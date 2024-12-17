@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 15:19:34 by nmonzon           #+#    #+#             */
-/*   Updated: 2024/12/16 17:34:38 by nmonzon          ###   ########.fr       */
+/*   Updated: 2024/12/17 12:22:35 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,6 @@ void	free_resources(t_seat *table, int n)
 	{
 		temp = current->next;
 		pthread_mutex_destroy(&current->death_mutex);
-		pthread_mutex_lock(current->philo->left_fork);
-		pthread_mutex_unlock(current->philo->left_fork);
 		pthread_mutex_destroy(current->philo->left_fork);
 		free(current->philo);
 		free(current);
