@@ -1,7 +1,7 @@
 # Philosophers (42 Project)
 #### Thread management and concurrency programming puzzle in C
 
-This project is about managing threads with millisecond precision to avoid deadlock and race conditions. A specified amount of philosophers sit around a table with some food in the middle. There is exactly one fork per philosopher, placed conceptually between each philosopher on the table. In order to eat, a philosopher needs both forks next to it. Philosophers follow a cycle of thinking, sleeping and eating one after the other (initial state can by any of the three). If a specified time passes before a philosopher can eat, it will die from starvation. The goal is to make a routine which will ensure the survival of the philosophers when possible, consistently. I did not do the bonus part for this project and scored 100% on the mandatory part.
+This project is about managing threads with millisecond precision to avoid deadlock and race conditions. A specified amount of philosophers sit around a table with some food in the middle. There is exactly one fork per philosopher, placed conceptually between each philosopher on the table. In order to eat, a philosopher needs both forks next to it. Philosophers follow a cycle of thinking, sleeping and eating one after the other (initial state can be any of the three). If a specified time passes before a philosopher can eat, it will die from starvation. The goal is to make a routine which will ensure the survival of the philosophers when possible, consistently. I did not do the bonus part for this project and scored 100% on the mandatory part.
 
 **Implementation:**
 
